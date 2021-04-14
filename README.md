@@ -1,5 +1,6 @@
 # Koa validation
 
+[![npm version](https://badge.fury.io/js/%40nexys%2Fkoa-validation.svg)](https://www.npmjs.com/package/@nexys/koa-validation)
 [![Test Package](https://github.com/nexys-system/koa-validation/actions/workflows/test.yml/badge.svg)](https://github.com/nexys-system/koa-validation/actions/workflows/test.yml)
 [![Publish](https://github.com/nexys-system/koa-validation/actions/workflows/publish.yml/badge.svg)](https://github.com/nexys-system/koa-validation/actions/workflows/publish.yml)
 
