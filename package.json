@@ -1,0 +1,28 @@
+{
+  "name": "@nexys/koa-validation",
+  "version": "1.0.0",
+  "description": "Validations for Koa",
+  "scripts": {
+    "test": "rm -rf dist && jest",
+    "build": "tsc"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "repository": "git@github.com:nexys-system/koa-validation.git",
+  "author": "Nexys",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "@types/jest": "^25.2.3",
+    "@types/nock": "^11.1.0",
+    "jest": "^26.0.1",
+    "ts-jest": "^25.3.1",
+    "typescript": "^3.9.3"
+  },
+  "dependencies": {
+    "@nexys/utils": "^3.9.14"
+  }
+}
