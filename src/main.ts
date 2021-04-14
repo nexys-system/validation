@@ -39,11 +39,11 @@ const displayErrors = (err: T.Error, ctx: any) => {
   }
 };
 
-export const isShape = (shape: T.Shape) => (
+export const isShapeMiddleware = (shape: T.Shape) => (
   ctx: any, //Koa.Context,
   next: any //Koa.Next
 ) => {
-  const s = ctx.request.body;
+  const { body } = ctx.request;
 
   const err: T.Error = checkObject(s, shape);
 
@@ -52,9 +52,26 @@ export const isShape = (shape: T.Shape) => (
     return;
   }
 
-  ctx.state.formValidation = s;
+  if (isShape(shape, body, ctx)) {
+    ctx.state.bodyValidated = body;
 
-  next();
+    next();
+  }
+};
+
+export const isShape = <A = any>(
+  shape: T.Shape,
+  body: any,
+  ctx: any
+): body is A => {
+  const err: T.Error = checkObject(body, shape);
+
+  if (Object.keys(err).length > 0) {
+    displayErrors(err, ctx);
+    return false;
+  }
+
+  return true;
 };
 
 const isShapeType = (s: T.ShapeCore | T.Shape): s is T.Shape => {
