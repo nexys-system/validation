@@ -45,7 +45,7 @@ export const isShapeMiddleware = (shape: T.Shape) => (
 ) => {
   const { body } = ctx.request;
 
-  const err: T.Error = checkObject(s, shape);
+  const err: T.Error = checkObject(body, shape);
 
   if (Object.keys(err).length > 0) {
     displayErrors(err, ctx);
