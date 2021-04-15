@@ -13,8 +13,13 @@ const stringCheckAssign = (
     return true;
   }
 
-  if (!value || typeof value !== fieldType) {
+  if (!value) {
     err[keyLabel] = [errorLabel];
+    return false;
+  }
+
+  if (typeof value !== fieldType) {
+    err[keyLabel] = ["expected type " + fieldType];
     return false;
   }
 
@@ -52,11 +57,7 @@ export const isShapeMiddleware = (shape: T.Shape) => (
     return;
   }
 
-  if (isShape(shape, body, ctx)) {
-    ctx.state.bodyValidated = body;
-
-    next();
-  }
+  next();
 };
 
 export const isShape = <A = any>(

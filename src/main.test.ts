@@ -21,6 +21,17 @@ describe("checkObject", () => {
     });
   });
 
+  test("empty object", () => {
+    const input1 = { age: 23 };
+    const shape: Shape = { age: { type: "number" } };
+    expect(M.checkObject(input1, shape)).toEqual({});
+
+    const input2 = { age: "23" };
+    expect(M.checkObject(input2, shape)).toEqual({
+      age: ["expected type number"],
+    });
+  });
+
   test("optional attribute", () => {
     const input1 = {};
     const shape: Shape = {
