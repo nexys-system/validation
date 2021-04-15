@@ -1,5 +1,6 @@
 import * as M from "./main";
 import { Shape } from "./type";
+import * as VU from "./utils";
 
 describe("checkObject", () => {
   test("undefined object", () => {
@@ -118,9 +119,10 @@ describe("checkObject", () => {
 test("is shape", () => {
   const shape: Shape = {
     firstName: {},
+    isRick: { type: "boolean" },
   };
 
-  const body = { firstName: "john" };
+  const body = { firstName: "john", isRick: false };
   const is = M.isShape<{ firstName: string }>(shape, body, {});
 
   expect(is).toEqual(true);
