@@ -14,7 +14,7 @@ export const stringCheckAssign = (
     return true;
   }
 
-  if (!value) {
+  if (value === null || value === undefined) {
     err[keyLabel] = [errorLabel];
     return false;
   }
