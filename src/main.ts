@@ -1,6 +1,6 @@
 import * as T from "./type";
 
-const stringCheckAssign = (
+export const stringCheckAssign = (
   value: any,
   err: T.Error,
   keyLabel: string,
@@ -35,47 +35,7 @@ const stringCheckAssign = (
   return true;
 };
 
-const displayErrors = (err: T.Error, ctx: any) => {
-  //Koa.Context
-  if (Object.keys(err).length > 0) {
-    ctx.body = err;
-    ctx.status = 400;
-    return;
-  }
-};
-
-export const isShapeMiddleware = (shape: T.Shape) => (
-  ctx: any, //Koa.Context,
-  next: any //Koa.Next
-) => {
-  const { body } = ctx.request;
-
-  const err: T.Error = checkObject(body, shape);
-
-  if (Object.keys(err).length > 0) {
-    displayErrors(err, ctx);
-    return;
-  }
-
-  next();
-};
-
-export const isShape = <A = any>(
-  shape: T.Shape,
-  body: any,
-  ctx: any
-): body is A => {
-  const err: T.Error = checkObject(body, shape);
-
-  if (Object.keys(err).length > 0) {
-    displayErrors(err, ctx);
-    return false;
-  }
-
-  return true;
-};
-
-const isShapeType = (s: T.ShapeCore | T.Shape): s is T.Shape => {
+export const isShapeType = (s: T.ShapeCore | T.Shape): s is T.Shape => {
   const shapeCoreAttributes: (keyof T.ShapeCore)[] = [
     "optional",
     "extraCheck",
@@ -121,4 +81,65 @@ export const checkObject = (
   });
 
   return err;
+};
+
+// middleware for Koa
+
+/**
+ *
+ * @param err error Objet to be displayed
+ * @param ctx //Koa.Context
+ * @returns
+ */
+export const displayErrors = (
+  err: T.Error,
+  ctx: any,
+  statusCode: number = 400
+) => {
+  ctx.body = err;
+  ctx.status = statusCode;
+  return;
+};
+
+/**
+ *
+ * @param shape
+ *
+ * @param ctx//Koa.Context,
+ * @param next // Koa.Next
+ * @returns
+ */
+export const isShapeMiddleware = (shape: T.Shape) => (ctx: any, next: any) => {
+  const { body } = ctx.request;
+
+  const err: T.Error = checkObject(body, shape);
+
+  if (Object.keys(err).length > 0) {
+    displayErrors(err, ctx);
+    return;
+  }
+
+  next();
+};
+
+/**
+ *
+ * @param shape input expected Shape
+ * @param body in Koa: ctx.request.body
+ * @param ctx //Koa.Context,
+ * @returns
+ */
+export const isShape = <A = any>(
+  shape: T.Shape,
+  body: any, // from
+  ctx: any
+): body is A => {
+  const err: T.Error = checkObject(body, shape);
+
+  if (Object.keys(err).length > 0) {
+    displayErrors(err, ctx);
+    return false;
+  }
+
+  return true;
 };

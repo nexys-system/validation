@@ -101,3 +101,71 @@ test("is shape", () => {
 
   expect(is).toEqual(true);
 });
+
+describe("sample", () => {
+  const shape: Shape = {
+    id: { type: "number" },
+  };
+
+  test("test1", () => {
+    const input = { id: 4 };
+
+    const is = M.checkObject(input, shape);
+
+    expect(is).toEqual({});
+  });
+
+  test("test2", () => {
+    const input = { id: "4" };
+
+    const is = M.checkObject(input, shape);
+
+    expect(is).toEqual({ id: ["expected type number"] });
+  });
+
+  test("test3", () => {
+    const shape: Shape = {
+      id: {
+        type: "number",
+        extraCheck: (s: any) => {
+          if (s < 10) {
+            return ["id must be greater than 10"];
+          }
+          return undefined;
+        },
+      },
+    };
+
+    const input = { id: 4 };
+    const is = M.checkObject(input, shape);
+
+    expect(is).toEqual({ id: ["id must be greater than 10"] });
+  });
+
+  test("test4 optional", () => {
+    const shape: Shape = {
+      id: {
+        type: "number",
+        optional: true,
+      },
+    };
+
+    const input = {};
+    const is = M.checkObject(input, shape);
+
+    expect(is).toEqual({});
+  });
+
+  test("test5 too many attributes - TODO", () => {
+    const shape: Shape = {
+      id: {
+        type: "number",
+      },
+    };
+
+    const input = { id: 4, name: "Jane" };
+    const is = M.checkObject(input, shape);
+
+    expect(is).toEqual({});
+  });
+});
