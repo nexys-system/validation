@@ -11,7 +11,7 @@
   "files": [
     "dist/*"
   ],
-  "repository": "git@github.com:nexys-system/koa-validation.git",
+  "repository": "git@github.com:nexys-system/validation.git",
   "author": "Nexys",
   "license": "MIT",
   "private": false,
