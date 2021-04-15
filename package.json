@@ -1,7 +1,7 @@
 {
-  "name": "@nexys/koa-validation",
+  "name": "@nexys/validation",
   "version": "1.0.4",
-  "description": "Validations for Koa",
+  "description": "Validation",
   "scripts": {
     "test": "rm -rf dist && jest",
     "build": "tsc"
