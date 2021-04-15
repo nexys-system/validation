@@ -16,7 +16,10 @@
   "files": [
     "dist/*"
   ],
-  "repository": "git@github.com:nexys-system/validation.git",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:nexys-system/validation.git"
+  },
   "author": "Nexys",
   "license": "MIT",
   "private": false,
