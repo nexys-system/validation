@@ -1,3 +1,4 @@
+import { Utils } from ".";
 import * as T from "./type";
 
 export const stringCheckAssign = (
@@ -172,3 +173,11 @@ export const isShape = <A = any>(
 
   return true;
 };
+
+export const isUuid = isShapeMiddleware({
+  uuid: { extraCheck: Utils.checkUuid },
+});
+
+export const isId = isShapeMiddleware({
+  id: { type: "number", extraCheck: Utils.checkId },
+});

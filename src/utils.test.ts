@@ -16,3 +16,18 @@ test("check uuid", () => {
   );
   expect(U.checkUuid("jo")).toEqual(["uuid invalid"]);
 });
+
+test("regex check", () => {
+  const r: RegExp = /^My\d{3}$/;
+
+  expect(U.regexCheck("My123", r)).toEqual(undefined);
+  expect(U.regexCheck("My1234", r)).toEqual([
+    "regex /^My\\d{3}$/ not satisfied",
+  ]);
+});
+
+test("is id", () => {
+  expect(U.checkId(12)).toEqual(undefined);
+  expect(U.checkId(-1)).toEqual(["id must be greater than 0"]);
+  expect(U.checkId(1.54)).toEqual(["id must be an integer"]);
+});
