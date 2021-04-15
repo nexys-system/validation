@@ -35,7 +35,9 @@ router.post(
     name: {}
   }),
   async ctx => {
-    const { uuid, name }: { uuid: Uuid; name: string } = ctx.state.body;
+    // now that the body has been validated this can be safely typed/cast to the expected type.
+    // Note that the type should match the validation shape
+    const { uuid, name }: { uuid: Uuid; name: string } = ctx.request.body;
     ctx.body = await myFunc(uuid, name);
   }
 );
