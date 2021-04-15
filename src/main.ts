@@ -135,10 +135,13 @@ export const displayErrors = (
  * @param next // Koa.Next
  * @returns
  */
-export const isShapeMiddleware = (shape: T.Shape) => (ctx: any, next: any) => {
+export const isShapeMiddleware = (
+  shape: T.Shape,
+  errorsIfExtraAttribute: boolean = true
+) => (ctx: any, next: any) => {
   const { body } = ctx.request;
 
-  const err: T.Error = checkObject(body, shape);
+  const err: T.Error = checkObject(body, shape, errorsIfExtraAttribute);
 
   if (Object.keys(err).length > 0) {
     displayErrors(err, ctx);
