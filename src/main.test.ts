@@ -54,10 +54,34 @@ describe("checkObject", () => {
   });
 
   test("nested object", () => {
-    const input = { profile: { firstName: "fd", lastName: "bla" } };
+    const input = {
+      profile: { firstName: "John", lastName: "Doe", middleName: "myMiddle" },
+    };
     const subShape: Shape = { firstName: {}, lastName: {} };
     const shape: Shape = { email: {}, profile: subShape };
-    expect(M.checkObject(input, shape)).toEqual({
+    const r = M.checkObject(input, shape);
+
+    // in this case, an extra params was added (middle name), make sure that it was removed from object after validation
+    expect(input.profile.middleName).toEqual(undefined);
+
+    expect(r).toEqual({
+      email: ["This field is required"],
+      profile: { middleName: ["this key cannot be included"] },
+    });
+  });
+
+  test("nested object - does not display extra error", () => {
+    const input = {
+      profile: { firstName: "John", lastName: "Doe", middleName: "myMiddle" },
+    };
+    const subShape: Shape = { firstName: {}, lastName: {} };
+    const shape: Shape = { email: {}, profile: subShape };
+    const r = M.checkObject(input, shape, false);
+
+    // in this case, an extra params was added (middle name), make sure that it was removed from object after validation
+    expect(input.profile.middleName).toEqual(undefined);
+
+    expect(r).toEqual({
       email: ["This field is required"],
     });
   });
@@ -156,7 +180,7 @@ describe("sample", () => {
     expect(is).toEqual({});
   });
 
-  test("test5 too many attributes - TODO", () => {
+  test("test5 too many attributes", () => {
     const shape: Shape = {
       id: {
         type: "number",
@@ -166,6 +190,6 @@ describe("sample", () => {
     const input = { id: 4, name: "Jane" };
     const is = M.checkObject(input, shape);
 
-    expect(is).toEqual({});
+    expect(is).toEqual({ name: ["this key cannot be included"] });
   });
 });

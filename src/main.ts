@@ -50,20 +50,46 @@ export const isShapeType = (s: T.ShapeCore | T.Shape): s is T.Shape => {
     .reduce((x, y) => x || y, false);
 };
 
+/**
+ *
+ * @param input
+ * @param shape : validation shape
+ * @param err : error object
+ * @param errorsIfExtraAttribute: add to the error object if extra args
+ * @returns error object
+ */
 export const checkObject = (
   input: any,
   shape: T.Shape,
-  err: T.Error = {}
+  errorsIfExtraAttribute: boolean = true
 ): T.Error => {
   if (!input) {
     throw Error("input needs to be undefined");
   }
 
-  Object.entries(shape).map(([k, v]) => {
+  const err: T.Error = {};
+
+  const oShape = Object.entries(shape);
+  const shapeKeys: string[] = oShape.map(([k]) => k);
+
+  // go through the keys of the input object and see if some are not included in the validation shape
+  Object.keys(input).map((inputKey) => {
+    if (!shapeKeys.includes(inputKey)) {
+      // an unexpected key was not found. Removing it from the object
+      delete input[inputKey];
+
+      // if flag is on, add an error
+      if (errorsIfExtraAttribute === true) {
+        err[inputKey] = ["this key cannot be included"];
+      }
+    }
+  });
+
+  oShape.map(([k, v]) => {
     const inputUnit = input[k];
 
     if (isShapeType(v)) {
-      const r = checkObject(inputUnit || {}, v);
+      const r = checkObject(inputUnit || {}, v, errorsIfExtraAttribute);
       if (Object.keys(r).length > 0) {
         err[k] = r;
       }
