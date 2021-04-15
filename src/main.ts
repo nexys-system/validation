@@ -139,7 +139,7 @@ export const displayErrors = (
 export const isShapeMiddleware = (
   shape: T.Shape,
   errorsIfExtraAttribute: boolean = true
-) => (ctx: any, next: any) => {
+) => async (ctx: any, next: any) => {
   const { body } = ctx.request;
 
   const err: T.Error = checkObject(body, shape, errorsIfExtraAttribute);
@@ -149,7 +149,7 @@ export const isShapeMiddleware = (
     return;
   }
 
-  next();
+  await next();
 };
 
 /**
