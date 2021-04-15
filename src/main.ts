@@ -1,4 +1,4 @@
-import { Utils } from ".";
+import * as Utils from "./utils";
 import * as T from "./type";
 
 export const stringCheckAssign = (
