@@ -2,6 +2,11 @@
   "name": "@nexys/validation",
   "version": "1.0.8",
   "description": "Validation",
+  "keywords": [
+    "validation",
+    "typescript",
+    "koa"
+  ],
   "scripts": {
     "test": "rm -rf dist && jest",
     "build": "tsc"
