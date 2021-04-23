@@ -128,6 +128,35 @@ test("is shape", () => {
   expect(is).toEqual(true);
 });
 
+test("is shape array", () => {
+  expect(M.isShapeArrayType({ $array: {} })).toEqual(true);
+  expect(M.isShapeArrayType({})).toEqual(false);
+});
+
+test("is array", () => {
+  const shape: Shape = {
+    firstName: {},
+    titles: { $array: { type: "boolean" } },
+  };
+
+  const body = { firstName: "john", titles: [true] };
+  const m = M.checkObject(body, shape);
+
+  expect(m).toEqual({});
+});
+
+test("is array 2", () => {
+  const shape: Shape = {
+    firstName: {},
+    titles: { $array: { type: "boolean" } },
+  };
+
+  const body = { firstName: "john", titles: true };
+  const m = M.checkObject(body, shape);
+
+  expect(m).toEqual({ titles: ["array expected"] });
+});
+
 describe("sample", () => {
   const shape: Shape = {
     id: { type: "number" },

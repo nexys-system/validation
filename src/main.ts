@@ -36,7 +36,9 @@ export const stringCheckAssign = (
   return true;
 };
 
-export const isShapeType = (s: T.ShapeCore | T.Shape): s is T.Shape => {
+export const isShapeType = (
+  s: T.ShapeCore | T.Shape | T.ShapeArray
+): s is T.Shape => {
   const shapeCoreAttributes: (keyof T.ShapeCore)[] = [
     "optional",
     "extraCheck",
@@ -49,6 +51,16 @@ export const isShapeType = (s: T.ShapeCore | T.Shape): s is T.Shape => {
   return keys
     .map((k) => !(shapeCoreAttributes as string[]).includes(k))
     .reduce((x, y) => x || y, false);
+};
+
+export const isShapeArrayType = (
+  s: T.ShapeCore | T.Shape | T.ShapeArray
+): s is T.ShapeArray => {
+  const keys = Object.keys(s);
+
+  const r = keys.length === 1 && keys[0] === "$array";
+  console.log(s, r, keys[0]);
+  return r;
 };
 
 /**
@@ -89,21 +101,40 @@ export const checkObject = (
   oShape.map(([k, v]) => {
     const inputUnit = input[k];
 
-    if (isShapeType(v)) {
-      const r = checkObject(inputUnit || {}, v, errorsIfExtraAttribute);
-      if (Object.keys(r).length > 0) {
-        err[k] = r;
+    if (isShapeArrayType(v)) {
+      const w = v["$array"];
+      console.log(k, w, inputUnit);
+
+      if (!Array.isArray(inputUnit)) {
+        err[k] = ["array expected"];
+      } else {
+        /* const r: T.Error =  checkObject(
+          inputUnit || {},
+          w,
+          errorsIfExtraAttribute
+        );
+
+        if (Object.keys(r).length > 0) {
+          err[k] = r;
+        }*/
       }
     } else {
-      stringCheckAssign(
-        inputUnit,
-        err,
-        k,
-        v.optional,
-        v.extraCheck,
-        v.type,
-        v.errorLabel
-      );
+      if (isShapeType(v)) {
+        const r = checkObject(inputUnit || {}, v, errorsIfExtraAttribute);
+        if (Object.keys(r).length > 0) {
+          err[k] = r;
+        }
+      } else {
+        stringCheckAssign(
+          inputUnit,
+          err,
+          k,
+          v.optional,
+          v.extraCheck,
+          v.type,
+          v.errorLabel
+        );
+      }
     }
   });
 
