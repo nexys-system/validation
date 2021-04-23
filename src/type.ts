@@ -2,7 +2,7 @@ export type ErrorOut = string[];
 
 export type Error = { [k: string]: ErrorOut | Error };
 
-export type FieldType = "string" | "number" | "boolean";
+export type FieldType = "string" | "number" | "boolean" | "object";
 
 export interface ShapeCore {
   optional?: boolean;

@@ -144,6 +144,29 @@ test("is array", () => {
 
   expect(m).toEqual({});
 });
+test("is object - wrong type", () => {
+  const shape: Shape = {
+    firstName: {},
+    myObj: { type: "object" },
+  };
+
+  const body = { firstName: "john", myObj: true };
+  const m = M.checkObject(body, shape);
+
+  expect(m).toEqual({ myObj: ["expected type object"] });
+});
+
+test("is object - ok", () => {
+  const shape: Shape = {
+    firstName: {},
+    myObj: { type: "object" },
+  };
+
+  const body = { firstName: "john", myObj: {} };
+  const m = M.checkObject(body, shape);
+
+  expect(m).toEqual({});
+});
 
 test("is array 2", () => {
   const shape: Shape = {
