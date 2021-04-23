@@ -59,7 +59,7 @@ export const isShapeArrayType = (
   const keys = Object.keys(s);
 
   const r = keys.length === 1 && keys[0] === "$array";
-  console.log(s, r, keys[0]);
+  //console.log(s, r, keys[0]);
   return r;
 };
 
@@ -103,7 +103,6 @@ export const checkObject = (
 
     if (isShapeArrayType(v)) {
       const w = v["$array"];
-      console.log(k, w, inputUnit);
 
       if (!Array.isArray(inputUnit)) {
         err[k] = ["array expected"];
