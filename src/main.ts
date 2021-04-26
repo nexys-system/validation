@@ -44,9 +44,11 @@ export const isShapeType = (
     "extraCheck",
     "type",
     "errorLabel",
+    "defaultValue",
   ];
 
   const keys = Object.keys(s);
+  //console.log(keys);
 
   return keys
     .map((k) => !(shapeCoreAttributes as string[]).includes(k))
@@ -77,7 +79,7 @@ export const checkObject = (
   errorsIfExtraAttribute: boolean = true
 ): T.Error => {
   if (!input) {
-    throw Error("input needs to be undefined");
+    throw Error("input needs to be defined");
   }
 
   const err: T.Error = {};
@@ -88,7 +90,7 @@ export const checkObject = (
   // go through the keys of the input object and see if some are not included in the validation shape
   Object.keys(input).map((inputKey) => {
     if (!shapeKeys.includes(inputKey)) {
-      // an unexpected key was not found. Removing it from the object
+      // an unexpected key was found. Removing it from the object
       delete input[inputKey];
 
       // if flag is on, add an error
@@ -101,19 +103,20 @@ export const checkObject = (
   oShape.map(([k, v]) => {
     const inputUnit = input[k];
 
-    if (isShapeArrayType(v)) {
-      const w = v["$array"];
+    //console.log(inputUnit);
+    //console.log(v);
+    if (v === "b") {
+      throw new Error("bla");
+    }
 
+    if (isShapeArrayType(v)) {
+      //const w = v["$array"];
+      //console.log("is shape array");
       if (!Array.isArray(inputUnit)) {
         err[k] = ["array expected"];
       } else {
-        /* const r: T.Error =  checkObject(
-          inputUnit || {},
-          w,
-          errorsIfExtraAttribute
-        );
-
-        if (Object.keys(r).length > 0) {
+        //const r: T.Error = checkObject(inputUnit, w, errorsIfExtraAttribute);
+        /* if (Object.keys(r).length > 0) {
           err[k] = r;
         }*/
       }
@@ -133,6 +136,11 @@ export const checkObject = (
           v.type,
           v.errorLabel
         );
+
+        // assign default value
+        if (inputUnit === undefined && v.defaultValue) {
+          input[k] = v.defaultValue;
+        }
       }
     }
   });

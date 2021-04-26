@@ -8,7 +8,7 @@
     "koa"
   ],
   "scripts": {
-    "test": "rm -rf dist && jest",
+    "test": "rm -rf dist && jest --verbose",
     "build": "tsc"
   },
   "main": "dist/index.js",

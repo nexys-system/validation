@@ -9,6 +9,7 @@ export interface ShapeCore {
   type?: FieldType;
   extraCheck?: (s: string) => string[] | undefined;
   errorLabel?: string;
+  defaultValue?: string;
 }
 
 export type ShapeLinear = {

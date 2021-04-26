@@ -10,7 +10,7 @@ describe("checkObject", () => {
     try {
       M.checkObject(input, shape);
     } catch (e) {
-      expect(e.message).toEqual("input needs to be undefined");
+      expect(e.message).toEqual("input needs to be defined");
     }
   });
 
@@ -46,6 +46,28 @@ describe("checkObject", () => {
     expect(M.checkObject(input1, shape)).toEqual({
       email: ["This field is required"],
     });
+
+    const input2 = { firstName: "john" };
+    expect(M.checkObject(input2, shape)).toEqual({
+      email: ["This field is required"],
+      firstName: ["at least 3 char long"],
+    });
+  });
+
+  test("optional attribute with default value", () => {
+    const input1 = { email: "gfds" };
+    const shape: Shape = {
+      email: {},
+      firstName: {
+        optional: true,
+        defaultValue: "Joe",
+        extraCheck: (s: string): string[] | undefined =>
+          s.length > 3 ? ["at least 3 char long"] : undefined,
+      },
+    };
+    expect(M.checkObject(input1, shape)).toEqual({});
+
+    expect((input1 as any).firstName).toEqual("Joe");
 
     const input2 = { firstName: "john" };
     expect(M.checkObject(input2, shape)).toEqual({
