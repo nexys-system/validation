@@ -103,22 +103,37 @@ export const checkObject = (
   oShape.map(([k, v]) => {
     const inputUnit = input[k];
 
-    //console.log(inputUnit);
-    //console.log(v);
+    console.log(inputUnit);
+    console.log(v);
     if (v === "b") {
       throw new Error("bla");
     }
 
     if (isShapeArrayType(v)) {
-      //const w = v["$array"];
-      //console.log("is shape array");
+      const w: T.ShapeCore = v["$array"];
+      console.log("is shape array");
       if (!Array.isArray(inputUnit)) {
         err[k] = ["array expected"];
       } else {
-        //const r: T.Error = checkObject(inputUnit, w, errorsIfExtraAttribute);
-        /* if (Object.keys(r).length > 0) {
-          err[k] = r;
-        }*/
+        const ve = inputUnit
+          .map((inp, i) => {
+            const e: T.Error = {};
+            // const r: T.Error = checkObject(inputUnit[0], w, errorsIfExtraAttribute);
+            stringCheckAssign(
+              inp,
+              e,
+              String(i),
+              w.optional,
+              w.extraCheck,
+              w.type,
+              w.errorLabel
+            );
+            return e;
+          })
+          .filter((v) => Object.keys(v).length > 0);
+
+        console.log(ve);
+        w;
       }
     } else {
       if (isShapeType(v)) {
