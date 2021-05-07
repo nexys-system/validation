@@ -4,6 +4,7 @@ test("check email", () => {
   expect(U.emailCheck("john@doe.com")).toEqual(undefined);
   expect(U.emailCheck("johndoe.com")).toEqual(["email invalid"]);
   expect(U.emailCheck("tm8045@ch.ibm.com")).toEqual(undefined);
+  expect(U.emailCheck(" tm8045@ch.ibm.com")).toEqual(["email must not contain any whitespace (before or after)"]);
 });
 
 test("check password", () => {
