@@ -2,6 +2,12 @@ import * as VT from "./type";
 import NUtils from "@nexys/utils";
 
 export const emailCheck = (email: string): VT.ErrorOut | undefined => {
+   const tEmail = email.trim();
+  
+  if (tEmail !== email) {
+    return ["email must not contain any whitespace (before or after)"];
+  }
+  
   if (!NUtils.string.isEmail(email)) {
     return ["email invalid"];
   }
