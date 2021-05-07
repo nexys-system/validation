@@ -3,6 +3,7 @@ import * as U from "./utils";
 test("check email", () => {
   expect(U.emailCheck("john@doe.com")).toEqual(undefined);
   expect(U.emailCheck("johndoe.com")).toEqual(["email invalid"]);
+  expect(U.emailCheck("tm8045@ch.ibm.com")).toEqual(undefined);
 });
 
 test("check password", () => {
