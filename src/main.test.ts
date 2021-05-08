@@ -54,6 +54,27 @@ describe("checkObject", () => {
     });
   });
 
+  test("optional attribute - $optional alias", () => {
+    const input1 = {};
+    const shape: Shape = {
+      email: {},
+      firstName: {
+        optional: true,
+        extraCheck: (s: string): string[] | undefined =>
+          s.length > 3 ? ["at least 3 char long"] : undefined,
+      },
+    };
+    expect(M.checkObject(input1, shape)).toEqual({
+      email: ["This field is required"],
+    });
+
+    const input2 = { firstName: "john" };
+    expect(M.checkObject(input2, shape)).toEqual({
+      email: ["This field is required"],
+      firstName: ["at least 3 char long"],
+    });
+  });
+
   test("optional attribute with default value", () => {
     const input1 = { email: "gfds" };
     const shape: Shape = {
@@ -136,6 +157,25 @@ describe("checkObject", () => {
       },
     });
   });
+
+  test("nested object - optional", () => {
+    const input = {};
+    const subShape: Shape = {
+      firstName: { errorLabel: "First name is required" },
+      lastName: {},
+    };
+    const shape: Shape = {
+      email: {},
+      profile: { ...subShape },
+    };
+    expect(M.checkObject(input, shape)).toEqual({
+      email: ["This field is required"],
+      profile: {
+        firstName: ["First name is required"],
+        lastName: ["This field is required"],
+      },
+    });
+  });
 });
 
 test("is shape", () => {
@@ -150,22 +190,82 @@ test("is shape", () => {
   expect(is).toEqual(true);
 });
 
-test("is shape array", () => {
+/*test("is shape array", () => {
   expect(M.isShapeArrayType({ $array: {} })).toEqual(true);
   expect(M.isShapeArrayType({})).toEqual(false);
-});
+});*/
 
-test("is array", () => {
+test("is array - correct input", () => {
   const shape: Shape = {
     firstName: {},
     titles: { $array: { type: "boolean" } },
   };
 
-  const body = { firstName: "john", titles: [true] };
+  const body = { firstName: "john", titles: [true, false] };
   const m = M.checkObject(body, shape);
 
   expect(m).toEqual({});
 });
+
+test("is array - wrong input", () => {
+  const shape: Shape = {
+    firstName: {},
+    titles: { $array: { type: "boolean" } },
+  };
+
+  const body = { firstName: "john", titles: [true, 4, "jk", false] };
+  const m = M.checkObject(body, shape);
+
+  expect(m).toEqual({
+    titles: {
+      "1": ["expected type boolean"],
+      "2": ["expected type boolean"],
+    },
+  });
+});
+
+test("is array of objects - correct shape", () => {
+  const shape: Shape = {
+    firstName: {},
+    titles: { $array: { name: {}, id: { type: "number" } } },
+  };
+
+  const body = {
+    firstName: "john",
+    titles: [
+      { id: 1, name: "foo1" },
+      { id: 2, name: "foo2" },
+    ],
+  };
+  const m = M.checkObject(body, shape);
+
+  expect(m).toEqual({});
+});
+
+test("is array of objects - wrong shape", () => {
+  const shape: Shape = {
+    firstName: {},
+    titles: { $array: { name: {}, id: { type: "number" } } },
+  };
+
+  const body = {
+    firstName: "john",
+    titles: [
+      { id: "fds", name: "foo1" },
+      { id: 2, name: "foo2" },
+    ],
+  };
+  const m = M.checkObject(body, shape);
+
+  expect(m).toEqual({
+    titles: {
+      "0": {
+        id: ["expected type number"],
+      },
+    },
+  });
+});
+
 test("is object - wrong type", () => {
   const shape: Shape = {
     firstName: {},
@@ -189,6 +289,18 @@ test("is object - ok", () => {
 
   expect(m).toEqual({});
 });
+
+/*test("is object - optional todo", () => {
+  const shape: Shape = {
+    firstName: {},
+    myObj: { id: { type: "number" }, optional: true },
+  };
+
+  const body = { firstName: "john", myObj: { id: 3 } };
+  const m = M.checkObject(body, shape);
+
+  expect(m).toEqual({});
+});*/
 
 test("is array 2", () => {
   const shape: Shape = {
