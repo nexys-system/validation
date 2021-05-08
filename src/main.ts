@@ -35,46 +35,9 @@ export const checkField = (
   return undefined;
 };
 
-const stringCheckAssign = (
-  value: any,
-  err: T.Error,
-  keyLabel: string,
-  optional: boolean = false, // by default field is mandatory
-  extraCheck?: (s: string) => string[] | undefined,
-  fieldType: T.FieldType = "string",
-  errorLabel = "This field is required"
-): boolean => {
-  // handle values that are not present, null, undefined
-  if (value === null || value === undefined) {
-    // if optional is allowed, return true and stop
-    if (optional === true) {
-      return true;
-    }
-    // else add error
-    err[keyLabel] = [errorLabel];
-    return false;
-  }
-
-  // check for value type
-  if (typeof value !== fieldType) {
-    err[keyLabel] = ["expected type " + fieldType];
-    return false;
-  }
-
-  // extra check
-  if (extraCheck) {
-    const e = extraCheck(value);
-
-    if (e) {
-      err[keyLabel] = e;
-      return false;
-    }
-  }
-
-  return true;
-};
-
 const shapeCoreAttributes: (keyof T.ShapeCore)[] = [
+  "$array",
+  "$object",
   "optional",
   "extraCheck",
   "type",
