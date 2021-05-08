@@ -1,7 +1,41 @@
 import * as Utils from "./utils";
 import * as T from "./type";
 
-export const stringCheckAssign = (
+export const checkField = (
+  value: any,
+  optional: boolean = false, // by default field is mandatory
+  extraCheck?: (s: string) => string[] | undefined,
+  fieldType: T.FieldType = "string",
+  errorLabel = "This field is required"
+): string[] | undefined => {
+  // handle values that are not present, null, undefined
+  if (value === null || value === undefined) {
+    // if optional is allowed, return true and stop
+    if (optional === true) {
+      return undefined;
+    }
+    // else add error
+    return [errorLabel];
+  }
+
+  // check for value type
+  if (typeof value !== fieldType) {
+    return ["expected type " + fieldType];
+  }
+
+  // extra check
+  if (extraCheck) {
+    const e = extraCheck(value);
+
+    if (e) {
+      return e;
+    }
+  }
+
+  return undefined;
+};
+
+const stringCheckAssign = (
   value: any,
   err: T.Error,
   keyLabel: string,
@@ -10,20 +44,24 @@ export const stringCheckAssign = (
   fieldType: T.FieldType = "string",
   errorLabel = "This field is required"
 ): boolean => {
-  if (!value && optional === true) {
-    return true;
-  }
-
+  // handle values that are not present, null, undefined
   if (value === null || value === undefined) {
+    // if optional is allowed, return true and stop
+    if (optional === true) {
+      return true;
+    }
+    // else add error
     err[keyLabel] = [errorLabel];
     return false;
   }
 
+  // check for value type
   if (typeof value !== fieldType) {
     err[keyLabel] = ["expected type " + fieldType];
     return false;
   }
 
+  // extra check
   if (extraCheck) {
     const e = extraCheck(value);
 
@@ -36,26 +74,28 @@ export const stringCheckAssign = (
   return true;
 };
 
+const shapeCoreAttributes: (keyof T.ShapeCore)[] = [
+  "optional",
+  "extraCheck",
+  "type",
+  "errorLabel",
+  "defaultValue",
+];
+
+/**
+ * decide between Shape or ShapeCore
+ * @param s : shape | shape core
+ * @returns boolean
+ * @note this could actually be done using the validation
+ */
 export const isShapeType = (
-  s: T.ShapeCore | T.Shape | T.ShapeArray
-): s is T.Shape => {
-  const shapeCoreAttributes: (keyof T.ShapeCore)[] = [
-    "optional",
-    "extraCheck",
-    "type",
-    "errorLabel",
-    "defaultValue",
-  ];
-
-  const keys = Object.keys(s);
-  //console.log(keys);
-
-  return keys
+  s: T.ShapeCore | T.Shape //| T.ShapeArray
+): s is T.Shape =>
+  Object.keys(s)
     .map((k) => !(shapeCoreAttributes as string[]).includes(k))
     .reduce((x, y) => x || y, false);
-};
 
-export const isShapeArrayType = (
+/*export const isShapeArrayType = (
   s: T.ShapeCore | T.Shape | T.ShapeArray
 ): s is T.ShapeArray => {
   const keys = Object.keys(s);
@@ -63,7 +103,7 @@ export const isShapeArrayType = (
   const r = keys.length === 1 && keys[0] === "$array";
   //console.log(s, r, keys[0]);
   return r;
-};
+};*/
 
 /**
  *
@@ -77,43 +117,88 @@ export const checkObject = (
   input: any,
   shape: T.Shape,
   errorsIfExtraAttribute: boolean = true
-): T.Error => {
+): T.Error | T.ErrorOut => {
+  //console.log(input);
   if (!input) {
     throw Error("input needs to be defined");
   }
 
-  const err: T.Error = {};
+  let err: T.Error | T.ErrorOut = {};
 
   const oShape = Object.entries(shape);
   const shapeKeys: string[] = oShape.map(([k]) => k);
+  // console.log(input, oShape);
 
-  // go through the keys of the input object and see if some are not included in the validation shape
-  Object.keys(input).map((inputKey) => {
-    if (!shapeKeys.includes(inputKey)) {
-      // an unexpected key was found. Removing it from the object
-      delete input[inputKey];
+  // go through the keys of the input object and see if some are not included in the validation shape, in which case it is either deleted or an error is added
+  if (!Array.isArray(input)) {
+    Object.keys(input).map((inputKey) => {
+      if (!shapeKeys.includes(inputKey)) {
+        // an unexpected key was found. Removing it from the object
+        delete input[inputKey];
 
-      // if flag is on, add an error
-      if (errorsIfExtraAttribute === true) {
-        err[inputKey] = ["this key cannot be included"];
+        // if flag is on, add an error
+        if (errorsIfExtraAttribute === true) {
+          (err as T.Error)[inputKey] = ["this key cannot be included"];
+        }
       }
-    }
-  });
+    });
+  }
 
-  oShape.map(([k, v]) => {
-    const inputUnit = input[k];
+  //console.log(input);
+  // go through the elements of the shape object
+  oShape.map(([shapeKey, shapeValue]) => {
+    const inputUnit = input[shapeKey];
+    //  console.log(input, inputUnit);
 
-    console.log(inputUnit);
-    console.log(v);
-    if (v === "b") {
-      throw new Error("bla");
-    }
+    //console.log(inputUnit);
+    //console.log(v);
+    //if (v === "b") {
+    //  throw new Error("bla");
+    //}
 
-    if (isShapeArrayType(v)) {
-      const w: T.ShapeCore = v["$array"];
+    // handle array
+    if (shapeKey === "$array") {
+      //  console.log("array", shapeKey, shapeValue, JSON.stringify(input));
+
+      if (!Array.isArray(input)) {
+        err = ["array expected"];
+      } else {
+        // input is an array, go through the array
+        input.forEach((inputUnit, arrayIdx) => {
+          //checkObject(inputUnit, (shapeValue as any) as T.ShapeCore);
+
+          if (!isShapeType(shapeValue)) {
+            const r = checkField(
+              inputUnit,
+              shapeValue.optional,
+              shapeValue.extraCheck,
+              shapeValue.type,
+              shapeValue.errorLabel
+            );
+
+            if (r) {
+              (err as T.Error)[arrayIdx] = r;
+            }
+          } else {
+            console.log("todo, when object in array");
+            const r = checkObject(
+              inputUnit || {},
+              shapeValue,
+              errorsIfExtraAttribute
+            );
+            if (Object.keys(r).length > 0) {
+              (err as T.Error)[arrayIdx] = r;
+            }
+          }
+        });
+        console.log("here", shapeKey, shapeValue, input);
+      }
+
+      //  if (isShapeArrayType(v)) {
+      /*  const w: T.ShapeCore = v["$array"];
       console.log("is shape array");
       if (!Array.isArray(inputUnit)) {
-        err[k] = ["array expected"];
+        err[shapeKey] = ["array expected"];
       } else {
         const ve = inputUnit
           .map((inp, i) => {
@@ -133,28 +218,42 @@ export const checkObject = (
           .filter((v) => Object.keys(v).length > 0);
 
         console.log(ve);
-        w;
-      }
+        w;*/
+      //}
     } else {
-      if (isShapeType(v)) {
-        const r = checkObject(inputUnit || {}, v, errorsIfExtraAttribute);
+      // handles nested, array, object etc
+      if (isShapeType(shapeValue)) {
+        // console.log(shapeValue);
+        const r = checkObject(
+          inputUnit || {},
+          shapeValue,
+          errorsIfExtraAttribute
+        );
         if (Object.keys(r).length > 0) {
-          err[k] = r;
+          (err as T.Error)[shapeKey] = r;
         }
       } else {
-        stringCheckAssign(
+        //const { $optional: optional } = inputUnit;
+
+        //if (optional) {
+        //  delete inputUnit["$optional"];
+        //}
+
+        const fieldError = checkField(
           inputUnit,
-          err,
-          k,
-          v.optional,
-          v.extraCheck,
-          v.type,
-          v.errorLabel
+          shapeValue.optional,
+          shapeValue.extraCheck,
+          shapeValue.type,
+          shapeValue.errorLabel
         );
 
+        if (fieldError) {
+          (err as T.Error)[shapeKey] = fieldError;
+        }
+
         // assign default value
-        if (inputUnit === undefined && v.defaultValue) {
-          input[k] = v.defaultValue;
+        if (inputUnit === undefined && shapeValue.defaultValue) {
+          input[shapeKey] = shapeValue.defaultValue;
         }
       }
     }
@@ -172,7 +271,7 @@ export const checkObject = (
  * @returns
  */
 export const displayErrors = (
-  err: T.Error,
+  err: T.Error | T.ErrorOut,
   ctx: any,
   statusCode: number = 400
 ) => {
@@ -195,7 +294,11 @@ export const isShapeMiddleware = (
 ) => async (ctx: any, next: any) => {
   const { body } = ctx.request;
 
-  const err: T.Error = checkObject(body, shape, errorsIfExtraAttribute);
+  const err: T.Error | T.ErrorOut = checkObject(
+    body,
+    shape,
+    errorsIfExtraAttribute
+  );
 
   if (Object.keys(err).length > 0) {
     displayErrors(err, ctx);
@@ -217,7 +320,7 @@ export const isShape = <A = any>(
   body: any, // from
   ctx: any
 ): body is A => {
-  const err: T.Error = checkObject(body, shape);
+  const err: T.Error | T.ErrorOut = checkObject(body, shape);
 
   if (Object.keys(err).length > 0) {
     displayErrors(err, ctx);
