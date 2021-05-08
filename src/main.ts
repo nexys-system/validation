@@ -36,8 +36,6 @@ export const checkField = (
 };
 
 const shapeCoreAttributes: (keyof T.ShapeCore)[] = [
-  "$array",
-  "$object",
   "optional",
   "extraCheck",
   "type",
