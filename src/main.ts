@@ -180,7 +180,7 @@ export const checkObject = (
               (err as T.Error)[arrayIdx] = r;
             }
           } else {
-            console.log("todo, when object in array");
+            // console.log("todo, when object in array");
             const r = checkObject(
               inputUnit || {},
               shapeValue,
@@ -191,7 +191,6 @@ export const checkObject = (
             }
           }
         });
-        console.log("here", shapeKey, shapeValue, input);
       }
 
       //  if (isShapeArrayType(v)) {
