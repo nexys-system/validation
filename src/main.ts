@@ -102,102 +102,116 @@ export const checkObject = (
     const inputUnit = input[shapeKey];
     //  console.log(input, inputUnit);
 
-    // handle array
-    if (shapeKey === "$array") {
-      //  console.log("array", shapeKey, shapeValue, JSON.stringify(input));
-
-      if (!Array.isArray(input)) {
-        err = ["array expected"];
-      } else {
-        // input is an array, go through the array
-        input.forEach((inputUnit, arrayIdx) => {
-          if (!isShapeType(shapeValue)) {
-            const r = checkField(
-              inputUnit,
-              shapeValue.optional,
-              shapeValue.extraCheck,
-              shapeValue.type,
-              shapeValue.errorLabel
-            );
-
-            if (r) {
-              (err as T.Error)[arrayIdx] = r;
-            }
-          } else {
-            // console.log("todo, when object in array");
-            const r = checkObject(
-              inputUnit || {},
-              shapeValue,
-              errorsIfExtraAttribute
-            );
-            if (Object.keys(r).length > 0) {
-              (err as T.Error)[arrayIdx] = r;
-            }
-          }
-        });
+    // handles nested, array, object etc
+    if (isShapeType(shapeValue)) {
+      const r = checkObject(
+        inputUnit || {},
+        shapeValue,
+        errorsIfExtraAttribute
+      );
+      if (Object.keys(r).length > 0) {
+        (err as T.Error)[shapeKey] = r;
       }
     } else {
-      // handles nested, array, object etc
-      if (isShapeType(shapeValue)) {
-        const r = checkObject(
-          inputUnit || {},
-          shapeValue,
-          errorsIfExtraAttribute
-        );
-        if (Object.keys(r).length > 0) {
-          (err as T.Error)[shapeKey] = r;
+      const { $object: obj, $array: arr } = shapeValue;
+
+      // general check
+      // - null/undefined
+      // - correct type
+
+      const fieldType = shapeValue.type || (obj || arr ? "object" : undefined);
+
+      const value = !!arr
+        ? inputUnit //["$array"]
+        : !!obj
+        ? inputUnit //[//"$object"]
+        : inputUnit;
+
+      console.log(shapeValue, inputUnit, value, arr, obj, !!arr, !!obj);
+
+      const fieldError = checkField(
+        value,
+        shapeValue.optional,
+        shapeValue.extraCheck,
+        fieldType,
+        shapeValue.errorLabel
+      );
+
+      if (fieldError) {
+        (err as T.Error)[shapeKey] = fieldError;
+      }
+
+      // assign default value
+      if (inputUnit === undefined && shapeValue.defaultValue) {
+        input[shapeKey] = shapeValue.defaultValue;
+      }
+
+      // handle $object
+
+      if (obj) {
+        //console.log("j");
+        //console.log(input, shapeKey, inputUnit);
+
+        const shape = obj as T.Shape;
+
+        if (inputUnit) {
+          const r = checkObject(inputUnit || {}, shape, errorsIfExtraAttribute);
+          if (Object.keys(r).length > 0) {
+            (err as T.Error)[shapeKey] = r;
+          }
+        }
+      } else if (arr) {
+        console.log("array", shapeKey, shapeValue, JSON.stringify(input));
+
+        if (!Array.isArray(inputUnit)) {
+          (err as T.Error)[shapeKey] = ["array expected"];
+        } else {
+          // input is an array, go through the array
+          inputUnit.forEach((inputUnit, arrayIdx) => {
+            if (!isShapeType(shapeValue)) {
+              const r = checkField(
+                inputUnit,
+                shapeValue.optional,
+                shapeValue.extraCheck,
+                shapeValue.type,
+                shapeValue.errorLabel
+              );
+
+              if (r) {
+                (err as T.Error)[arrayIdx] = r;
+              }
+            } else {
+              // console.log("todo, when object in array");
+              const r = checkObject(
+                inputUnit || {},
+                shapeValue,
+                errorsIfExtraAttribute
+              );
+              if (Object.keys(r).length > 0) {
+                (err as T.Error)[arrayIdx] = r;
+              }
+            }
+          });
         }
       } else {
-        // handle $object
-        const { $object: obj } = shapeValue;
-        if (obj) {
-          //console.log("j");
-          //console.log(input, shapeKey, inputUnit);
+        // handle non object/array
 
-          const shape = obj as T.Shape;
+        const fieldError = checkField(
+          inputUnit,
+          shapeValue.optional,
+          shapeValue.extraCheck,
+          shapeValue.type,
+          shapeValue.errorLabel
+        );
 
-          const fieldError = checkField(
-            inputUnit,
-            shapeValue.optional,
-            shapeValue.extraCheck,
-            "object",
-            shapeValue.errorLabel
-          );
-
-          if (fieldError) {
-            (err as T.Error)[shapeKey] = fieldError;
-          }
-
-          if (inputUnit) {
-            const r = checkObject(
-              inputUnit || {},
-              shape,
-              errorsIfExtraAttribute
-            );
-            if (Object.keys(r).length > 0) {
-              (err as T.Error)[shapeKey] = r;
-            }
-          }
-        } else {
-          // handle non object/array
-
-          const fieldError = checkField(
-            inputUnit,
-            shapeValue.optional,
-            shapeValue.extraCheck,
-            shapeValue.type,
-            shapeValue.errorLabel
-          );
-
-          if (fieldError) {
-            (err as T.Error)[shapeKey] = fieldError;
-          }
+        if (fieldError) {
+          (err as T.Error)[shapeKey] = fieldError;
         }
+      }
 
-        // assign default value
-        if (inputUnit === undefined && shapeValue.defaultValue) {
-          input[shapeKey] = shapeValue.defaultValue;
-        }
+      // assign default value
+      if (inputUnit === undefined && shapeValue.defaultValue) {
+        input[shapeKey] = shapeValue.defaultValue;
       }
     }
   });

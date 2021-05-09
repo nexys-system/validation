@@ -1,5 +1,6 @@
 import * as M from "./main";
 import { Shape } from "./type";
+import * as U from "./utils";
 
 test("is array - correct input", () => {
   const shape: Shape = {
@@ -70,6 +71,30 @@ test("is array of objects - wrong shape", () => {
       },
     },
   });
+});
+
+test("is array 2", () => {
+  const shape: Shape = {
+    firstName: {},
+    titles: { $array: { type: "boolean" } },
+  };
+
+  const body = { firstName: "john", titles: true };
+  const m = M.checkObject(body, shape);
+
+  expect(m).toEqual({ titles: ["array expected"] });
+});
+
+test("is array - array of emails", () => {
+  const shape: Shape = {
+    firstName: {},
+    emails: { $array: {}, extraCheck: U.emailCheck },
+  };
+
+  const input = { firstName: "John", emails: ["john@doe.com"] };
+  const m = M.checkObject(input, shape);
+
+  expect(m).toEqual({});
 });
 
 test("is array 2", () => {
