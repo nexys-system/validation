@@ -41,6 +41,7 @@ const shapeCoreAttributes: (keyof T.ShapeCore)[] = [
   "type",
   "errorLabel",
   "defaultValue",
+  "$object",
 ];
 
 /**
@@ -55,16 +56,6 @@ export const isShapeType = (
   Object.keys(s)
     .map((k) => !(shapeCoreAttributes as string[]).includes(k))
     .reduce((x, y) => x || y, false);
-
-/*export const isShapeArrayType = (
-  s: T.ShapeCore | T.Shape | T.ShapeArray
-): s is T.ShapeArray => {
-  const keys = Object.keys(s);
-
-  const r = keys.length === 1 && keys[0] === "$array";
-  //console.log(s, r, keys[0]);
-  return r;
-};*/
 
 /**
  *
@@ -111,12 +102,6 @@ export const checkObject = (
     const inputUnit = input[shapeKey];
     //  console.log(input, inputUnit);
 
-    //console.log(inputUnit);
-    //console.log(v);
-    //if (v === "b") {
-    //  throw new Error("bla");
-    //}
-
     // handle array
     if (shapeKey === "$array") {
       //  console.log("array", shapeKey, shapeValue, JSON.stringify(input));
@@ -126,8 +111,6 @@ export const checkObject = (
       } else {
         // input is an array, go through the array
         input.forEach((inputUnit, arrayIdx) => {
-          //checkObject(inputUnit, (shapeValue as any) as T.ShapeCore);
-
           if (!isShapeType(shapeValue)) {
             const r = checkField(
               inputUnit,
@@ -153,37 +136,9 @@ export const checkObject = (
           }
         });
       }
-
-      //  if (isShapeArrayType(v)) {
-      /*  const w: T.ShapeCore = v["$array"];
-      console.log("is shape array");
-      if (!Array.isArray(inputUnit)) {
-        err[shapeKey] = ["array expected"];
-      } else {
-        const ve = inputUnit
-          .map((inp, i) => {
-            const e: T.Error = {};
-            // const r: T.Error = checkObject(inputUnit[0], w, errorsIfExtraAttribute);
-            stringCheckAssign(
-              inp,
-              e,
-              String(i),
-              w.optional,
-              w.extraCheck,
-              w.type,
-              w.errorLabel
-            );
-            return e;
-          })
-          .filter((v) => Object.keys(v).length > 0);
-
-        console.log(ve);
-        w;*/
-      //}
     } else {
       // handles nested, array, object etc
       if (isShapeType(shapeValue)) {
-        // console.log(shapeValue);
         const r = checkObject(
           inputUnit || {},
           shapeValue,
@@ -193,22 +148,50 @@ export const checkObject = (
           (err as T.Error)[shapeKey] = r;
         }
       } else {
-        //const { $optional: optional } = inputUnit;
+        // handle $object
+        const { $object: obj } = shapeValue;
+        if (obj) {
+          //console.log("j");
+          //console.log(input, shapeKey, inputUnit);
 
-        //if (optional) {
-        //  delete inputUnit["$optional"];
-        //}
+          const shape = obj as T.Shape;
 
-        const fieldError = checkField(
-          inputUnit,
-          shapeValue.optional,
-          shapeValue.extraCheck,
-          shapeValue.type,
-          shapeValue.errorLabel
-        );
+          const fieldError = checkField(
+            inputUnit,
+            shapeValue.optional,
+            shapeValue.extraCheck,
+            "object",
+            shapeValue.errorLabel
+          );
 
-        if (fieldError) {
-          (err as T.Error)[shapeKey] = fieldError;
+          if (fieldError) {
+            (err as T.Error)[shapeKey] = fieldError;
+          }
+
+          if (inputUnit) {
+            const r = checkObject(
+              inputUnit || {},
+              shape,
+              errorsIfExtraAttribute
+            );
+            if (Object.keys(r).length > 0) {
+              err = r;
+            }
+          }
+        } else {
+          // handle non object/array
+
+          const fieldError = checkField(
+            inputUnit,
+            shapeValue.optional,
+            shapeValue.extraCheck,
+            shapeValue.type,
+            shapeValue.errorLabel
+          );
+
+          if (fieldError) {
+            (err as T.Error)[shapeKey] = fieldError;
+          }
         }
 
         // assign default value
