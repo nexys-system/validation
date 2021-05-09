@@ -37,6 +37,17 @@ test("is object - optional", () => {
   expect(m).toEqual({});
 });
 
-test("dummy", () => {
-  expect(true).toEqual(true);
+test("is object - optional nested", () => {
+  const shape: T.Shape = {
+    firstName: {},
+    myObj: {
+      id: { type: "number" },
+      obj: { $object: { id: { type: "number" } }, optional: true },
+    },
+  };
+
+  const body = { firstName: "john", myObj: { id: 4, obj: { id: 4 } } };
+  const m = M.checkObject(body, shape);
+
+  expect(m).toEqual({});
 });
