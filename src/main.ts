@@ -175,7 +175,7 @@ export const checkObject = (
               errorsIfExtraAttribute
             );
             if (Object.keys(r).length > 0) {
-              err = r;
+              (err as T.Error)[shapeKey] = r;
             }
           }
         } else {
