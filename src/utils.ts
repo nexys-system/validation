@@ -41,14 +41,28 @@ export const regexCheck = (
   return;
 };
 
+export const checkInteger = (
+  s: number,
+  allowNegatives: boolean = false
+): VT.ErrorOut | undefined => {
+  if (!Number.isSafeInteger(s)) {
+    return ["must be an integer"];
+  }
+
+  if (s < 0 && !allowNegatives) {
+    return ["negative numbers are not accepted"];
+  }
+
+  return undefined;
+};
+
 export const checkId = (s: any): VT.ErrorOut | undefined => {
-  if (s <= 0) {
+  const r = checkInteger(s);
+
+  // map integer error messages to id specific
+  if (r && r[0][0] === "n") {
     return ["id must be greater than 0"];
   }
 
-  if (s % 1 !== 0) {
-    return ["id must be an integer"];
-  }
-
-  return;
+  return r;
 };

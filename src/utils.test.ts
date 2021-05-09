@@ -4,7 +4,9 @@ test("check email", () => {
   expect(U.emailCheck("john@doe.com")).toEqual(undefined);
   expect(U.emailCheck("johndoe.com")).toEqual(["email invalid"]);
   expect(U.emailCheck("tm8045@ch.ibm.com")).toEqual(undefined);
-  expect(U.emailCheck(" tm8045@ch.ibm.com")).toEqual(["email must not contain any whitespace (before or after)"]);
+  expect(U.emailCheck(" tm8045@ch.ibm.com")).toEqual([
+    "email must not contain any whitespace (before or after)",
+  ]);
 });
 
 test("check password", () => {
@@ -31,5 +33,11 @@ test("regex check", () => {
 test("is id", () => {
   expect(U.checkId(12)).toEqual(undefined);
   expect(U.checkId(-1)).toEqual(["id must be greater than 0"]);
-  expect(U.checkId(1.54)).toEqual(["id must be an integer"]);
+  expect(U.checkId(1.54)).toEqual(["must be an integer"]);
+});
+
+test("is integer", () => {
+  expect(U.checkInteger(12)).toEqual(undefined);
+  expect(U.checkInteger(12.3)).toEqual(["must be an integer"]);
+  expect(U.checkInteger(-12)).toEqual(["negative numbers are not accepted"]);
 });
