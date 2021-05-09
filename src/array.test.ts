@@ -85,10 +85,10 @@ test("is array 2", () => {
   expect(m).toEqual({ titles: ["array expected"] });
 });
 
-test("is array - array of emails", () => {
+test("is array - array of emails -valid", () => {
   const shape: Shape = {
     firstName: {},
-    emails: { $array: {}, extraCheck: U.emailCheck },
+    emails: { $array: { extraCheck: U.emailCheck } }, //, ,
   };
 
   const input = { firstName: "John", emails: ["john@doe.com"] };
@@ -97,7 +97,19 @@ test("is array - array of emails", () => {
   expect(m).toEqual({});
 });
 
-test("is array 2", () => {
+test("is array - array of emails -invalid", () => {
+  const shape: Shape = {
+    firstName: {},
+    emails: { $array: { extraCheck: U.emailCheck } },
+  };
+
+  const input = { firstName: "John", emails: ["john @doe.com"] };
+  const m = M.checkObject(input, shape);
+
+  expect(m).toEqual({ emails: { 0: ["email invalid"] } });
+});
+
+test("is array 3", () => {
   const shape: Shape = {
     firstName: {},
     titles: { $array: { type: "boolean" } },
