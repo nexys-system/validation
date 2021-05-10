@@ -54,7 +54,7 @@ test("is object - optional nested", () => {
 });
 
 test('generic object - optional', () => {
-  const shape = {
+  const shape: T.Shape = {
     uuid: { extraCheck: U.checkUuid },
     params: { type: "object", optional: true },
     data: { type: "object", optional: true },
