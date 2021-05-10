@@ -1,5 +1,6 @@
 import * as M from "./main";
 import * as T from "./type";
+import * as U from "./utils";
 
 test("is object - optional set to false", () => {
   const shape: T.Shape = {
@@ -54,7 +55,7 @@ test("is object - optional nested", () => {
 
 test('generic object - optional', () => {
   const shape = {
-    uuid: { extraCheck: Validation.Utils.checkUuid },
+    uuid: { extraCheck: U.checkUuid },
     params: { type: "object", optional: true },
     data: { type: "object", optional: true },
   };
