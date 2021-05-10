@@ -51,3 +51,17 @@ test("is object - optional nested", () => {
 
   expect(m).toEqual({});
 });
+
+test('generic object - optional', () => {
+  const shape = {
+    uuid: { extraCheck: Validation.Utils.checkUuid },
+    params: { type: "object", optional: true },
+    data: { type: "object", optional: true },
+  };
+  
+  const input = {uuid: 'ef04fafc-af19-11eb-847c-42010aac003d'};
+  
+  const m = M.checkObject(input, shape);
+
+  expect(m).toEqual({});
+})
