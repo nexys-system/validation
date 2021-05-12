@@ -5,7 +5,7 @@ export type Error = { [k: string]: ErrorOut | Error };
 export type FieldType = "string" | "number" | "boolean" | "object";
 
 export interface ShapeCore {
-  $array?: Shape;
+  $array?: Shape | ShapeCore;
   $object?: Shape;
   optional?: boolean;
   //$optional?: boolean; // this is an alias for optional, especially relevant for nested objects

@@ -122,16 +122,10 @@ export const checkObject = (
 
       const fieldType = shapeValue.type || (obj || arr ? "object" : undefined);
 
-      const value = !!arr
-        ? inputUnit //["$array"]
-        : !!obj
-        ? inputUnit //[//"$object"]
-        : inputUnit;
-
-      //console.log(shapeValue, inputUnit, value, arr, !!arr);
+      //console.log(shapeValue, inputUnit, arr, !!arr);
 
       const fieldError = checkField(
-        value,
+        inputUnit,
         shapeValue.optional,
         shapeValue.extraCheck,
         fieldType,
@@ -161,7 +155,7 @@ export const checkObject = (
             (err as T.Error)[shapeKey] = r;
           }
         }
-      } else if (arr) {
+      } else if (arr && inputUnit) {
         /*console.log(
           "array",
           arr,
@@ -262,25 +256,24 @@ export const displayErrors = (
  * @param next // Koa.Next
  * @returns
  */
-export const isShapeMiddleware = (
-  shape: T.Shape,
-  errorsIfExtraAttribute: boolean = true
-) => async (ctx: any, next: any) => {
-  const { body } = ctx.request;
+export const isShapeMiddleware =
+  (shape: T.Shape, errorsIfExtraAttribute: boolean = true) =>
+  async (ctx: any, next: any) => {
+    const { body } = ctx.request;
 
-  const err: T.Error | T.ErrorOut = checkObject(
-    body,
-    shape,
-    errorsIfExtraAttribute
-  );
+    const err: T.Error | T.ErrorOut = checkObject(
+      body,
+      shape,
+      errorsIfExtraAttribute
+    );
 
-  if (Object.keys(err).length > 0) {
-    displayErrors(err, ctx);
-    return;
-  }
+    if (Object.keys(err).length > 0) {
+      displayErrors(err, ctx);
+      return;
+    }
 
-  await next();
-};
+    await next();
+  };
 
 /**
  *

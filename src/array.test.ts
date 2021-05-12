@@ -120,3 +120,15 @@ test("is array 3", () => {
 
   expect(m).toEqual({ titles: ["array expected"] });
 });
+
+test("optional array", () => {
+  const shape: Shape = {
+    firstName: {},
+    titles: { $array: { type: "boolean" }, optional: true },
+  };
+
+  const body = { firstName: "john" };
+  const m = M.checkObject(body, shape);
+
+  expect(m).toEqual({});
+});
