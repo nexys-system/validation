@@ -10,7 +10,7 @@ export interface ShapeCore {
   optional?: boolean;
   //$optional?: boolean; // this is an alias for optional, especially relevant for nested objects
   type?: FieldType;
-  extraCheck?: (s: string) => string[] | undefined; // here " | undefined " is used instead of "?" because of the signature of extraCheck
+  extraCheck?: (s: any) => string[] | undefined; // here " | undefined " is used instead of "?" because of the signature of extraCheck
   errorLabel?: string;
   defaultValue?: string; // todo change to any
 }
