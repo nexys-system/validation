@@ -30,5 +30,7 @@
     "ts-jest": "^25.3.1",
     "typescript": "^3.9.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@nexys/utils": "^3.9.14"
+  }
 }
