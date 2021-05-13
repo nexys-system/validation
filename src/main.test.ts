@@ -32,6 +32,19 @@ describe("checkObject", () => {
     });
   });
 
+  test("empty string", () => {
+    const input1 = { name: "" };
+    const shape: Shape = { name: {} };
+    expect(M.checkObject(input1, shape)).toEqual({
+      name: ["This field is required"],
+    });
+
+    const shape2: Shape = { name: { allowEmptyString: true } };
+    expect(M.checkObject(input1, shape2)).toEqual({
+      name: ["This field is required"],
+    });
+  });
+
   test("optional attribute", () => {
     const input1 = {};
     const shape: Shape = {

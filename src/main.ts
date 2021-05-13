@@ -6,10 +6,15 @@ export const checkField = (
   optional: boolean = false, // by default field is mandatory
   extraCheck?: (s: string) => string[] | undefined,
   fieldType: T.FieldType = "string",
-  errorLabel = "This field is required"
+  errorLabel = "This field is required",
+  allowEmptyString: boolean = false
 ): string[] | undefined => {
   // handle values that are not present, null, undefined
-  if (value === null || value === undefined) {
+  if (
+    value === null ||
+    value === undefined ||
+    (!allowEmptyString && typeof value === "string" && value === "")
+  ) {
     // if optional is allowed, return true and stop
     if (optional === true) {
       return undefined;
@@ -43,6 +48,7 @@ const shapeCoreAttributes: (keyof T.ShapeCore)[] = [
   "defaultValue",
   "$object",
   "$array",
+  "allowEmptyString",
 ];
 
 /**
@@ -212,7 +218,8 @@ export const checkObject = (
           shapeValue.optional,
           shapeValue.extraCheck,
           shapeValue.type,
-          shapeValue.errorLabel
+          shapeValue.errorLabel,
+          shapeValue.allowEmptyString
         );
 
         if (fieldError) {

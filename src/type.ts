@@ -13,6 +13,7 @@ export interface ShapeCore {
   extraCheck?: (s: any) => string[] | undefined; // here " | undefined " is used instead of "?" because of the signature of extraCheck
   errorLabel?: string;
   defaultValue?: string; // todo change to any
+  allowEmptyString?: boolean;
 }
 
 export type ShapeLinear = {
