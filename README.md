@@ -18,6 +18,11 @@ import Validation, {Type, Utils} from '@nexys/validation';
 
 see [tests](https://github.com/nexys-system/validation/blob/master/src/main.test.ts)
 
+* [simple](https://github.com/nexys-system/validation/blob/master/src/main.test.ts)
+* [objects](https://github.com/nexys-system/validation/blob/master/src/object.test.ts)
+  * [optional nested object](https://github.com/nexys-system/validation/blob/master/src/object.test.ts#L17)
+* [arrays](https://github.com/nexys-system/validation/blob/master/src/array.test.ts)
+
 ## Koa example
 
 ```
