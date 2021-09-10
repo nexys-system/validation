@@ -226,6 +226,18 @@ test("is object - ok", () => {
   expect(m).toEqual({});
 });
 
+test("is object - not present", () => {
+  const shape: Shape = {
+    firstName: {},
+    myObj: { type: "object" },
+  };
+
+  const body = { firstName: "john" };
+  const m = M.checkObject(body, shape);
+
+  expect(m).toEqual({ myObj: ["This field is required"] });
+});
+
 describe("sample", () => {
   const shape: Shape = {
     id: { type: "number" },
