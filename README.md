@@ -31,7 +31,7 @@ see [tests](https://github.com/nexys-system/validation/blob/master/src/main.test
 ```
 import Router from 'koa-router';
 import bodyParser from 'koa-body';
-import Validation, { Utils as VU } from '@nexys/koa-validation';
+import Validation, { Utils as VU } from '@nexys/validation';
 
 const router = new Router();
 
