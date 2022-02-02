@@ -1,5 +1,50 @@
 import * as VT from "./type";
-import NUtils from "@nexys/utils";
+
+/**
+ * note: taken from https://github.com/Nexysweb/utils/blob/master/src/string.ts#L159
+ * (no need to import all module just for a handful of functions)
+ * checks if input string is an email
+ * @param   email
+ * @return true/false
+ * @see  https://stackoverflow.com/questions/13912597/validate-email-one-liner-in-scala/32445372#32445372
+ * @see  http://www.w3.org/TR/html5/forms.html#valid-e-mail-address
+ */
+const isEmail = (email: string): boolean => {
+  const emailRegex = /^[a-zA-Z0-9\.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/i;
+
+  const regexResult = email.match(emailRegex);
+
+  if (!regexResult) {
+    return false;
+  }
+
+  return regexResult.includes(email);
+};
+
+/**
+ * note: taken from https://github.com/Nexysweb/utils/blob/master/src/string.ts#L186
+ * (no need to import all module just for a handful of functions)
+ * checks if input string is a valid UUID
+ * @param  {[type]} str     input UUID/string
+ * @param  {String} version UUID type: {'all', '3', '4' ,'5'}
+ * @return {[type]}         boolean
+ *
+ * taken from: https://github.com/validatorjs/validator.js/blob/master/src/lib/isUUID.js
+ */
+ export const isUUID = (
+  str: string,
+  version: 3 | 4 | 5 | "all" = "all"
+): Boolean => {
+  const patterns = {
+    3: /^[0-9A-F]{8}-[0-9A-F]{4}-3[0-9A-F]{3}-[0-9A-F]{4}-[0-9A-F]{12}$/i,
+    4: /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i,
+    5: /^[0-9A-F]{8}-[0-9A-F]{4}-5[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i,
+    all: /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i,
+  };
+
+  const pattern = patterns[version];
+  return pattern && pattern.test(str);
+};
 
 export const emailCheck = (email: string): VT.ErrorOut | undefined => {
   const tEmail = email.trim();
@@ -8,13 +53,13 @@ export const emailCheck = (email: string): VT.ErrorOut | undefined => {
     return ["email must not contain any whitespace (before or after)"];
   }
 
-  if (!NUtils.string.isEmail(email)) {
+  if (!isEmail(email)) {
     return ["email invalid"];
   }
 };
 
 export const checkUuid = (uuid: string): VT.ErrorOut | undefined => {
-  if (!NUtils.string.isUUID(uuid)) {
+  if (!isUUID(uuid)) {
     return ["uuid invalid"];
   }
 };
