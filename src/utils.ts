@@ -111,3 +111,72 @@ export const checkId = (s: any): VT.ErrorOut | undefined => {
 
   return r;
 };
+
+const monthW30Days = [4, 6, 9, 11];
+
+/**
+ * check ISO date format (YYYY-MM-DD)
+ * @see https://en.wikipedia.org/wiki/ISO_8601
+ */
+export const checkISODateFormat = (
+  s: string,
+  options: Partial<{ yearMin: number; yearMax: number }> = {}
+): V.Type.ErrorOut | undefined => {
+  const r = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if (r === null || r.length < 4) {
+    return ['date format not accepted, please pass YYYY-MM-DD'];
+  }
+
+  const [, year, month, day] = r;
+
+  const iDay = parseInt(day);
+  const iMonth = parseInt(month);
+  const iYear = parseInt(year);
+
+  const errors: string[] = [];
+
+  const { yearMin = 1900, yearMax = 2300 } = options;
+
+  if (iDay < 1) {
+    errors.push('day must be greater than zero');
+  }
+
+  if (iMonth < 1) {
+    errors.push('month must be greater than zero');
+  }
+
+  if (iMonth > 12) {
+    errors.push('month must be smaller than 12');
+  }
+
+  if (iYear < yearMin) {
+    errors.push('year must be greater than ' + yearMin);
+  }
+
+  if (iYear > yearMax) {
+    errors.push('year must be smaller than ' + yearMax);
+  }
+
+  const isLeapYear = Math.abs(1988 - iYear) % 4 === 0;
+
+  if (iMonth === 2) {
+    if (!isLeapYear && iDay > 28) {
+      errors.push('day must be smaller than 28 (feburary)');
+    }
+
+    if (isLeapYear && iDay > 29) {
+      errors.push('day must be smaller than 29 (february and leap year)');
+    }
+  } else if (monthW30Days.includes(iMonth)) {
+    errors.push(`day must be smaller than 30 (month of ${iMonth})`);
+  } else if (iDay > 31) {
+    errors.push('day must be smaller than 31');
+  }
+
+  if (errors.length > 0) {
+    return errors;
+  }
+
+  return undefined;
+};
