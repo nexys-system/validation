@@ -121,7 +121,7 @@ const monthW30Days = [4, 6, 9, 11];
 export const checkISODateFormat = (
   s: string,
   options: Partial<{ yearMin: number; yearMax: number }> = {}
-): V.Type.ErrorOut | undefined => {
+): VT.ErrorOut | undefined => {
   const r = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 
   if (r === null || r.length < 4) {
