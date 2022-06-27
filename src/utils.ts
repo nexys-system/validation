@@ -168,10 +168,14 @@ export const checkISODateFormat = (
     if (isLeapYear && iDay > 29) {
       errors.push('day must be smaller than 29 (february and leap year)');
     }
-  } else if (monthW30Days.includes(iMonth)) {
-    errors.push(`day must be smaller than 30 (month of ${iMonth})`);
-  } else if (iDay > 31) {
-    errors.push('day must be smaller than 31');
+  } else {
+    if (monthW30Days.includes(iMonth) && iDay > 30) {
+      errors.push(`day must be smaller than 30 (month of ${iMonth})`);
+    } else {
+      if (iDay > 31) {
+        errors.push('day must be smaller than 31');
+      }
+    }
   }
 
   if (errors.length > 0) {
