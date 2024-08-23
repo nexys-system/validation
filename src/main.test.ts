@@ -1,3 +1,4 @@
+import { test, expect, describe } from "bun:test";
 import * as M from "./main";
 import { Shape } from "./type";
 
@@ -118,7 +119,7 @@ describe("checkObject", () => {
     const r = M.checkObject(input, shape);
 
     // in this case, an extra params was added (middle name), make sure that it was removed from object after validation
-    expect(input.profile.middleName).toEqual(undefined);
+    expect(input.profile.middleName).toEqual(undefined as any);
 
     expect(r).toEqual({
       email: ["This field is required"],
@@ -135,7 +136,7 @@ describe("checkObject", () => {
     const r = M.checkObject(input, shape, false);
 
     // in this case, an extra params was added (middle name), make sure that it was removed from object after validation
-    expect(input.profile.middleName).toEqual(undefined);
+    expect(input.profile.middleName).toEqual(undefined as any);
 
     expect(r).toEqual({
       email: ["This field is required"],

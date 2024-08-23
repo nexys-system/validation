@@ -1,3 +1,5 @@
+import { test, expect } from "bun:test";
+
 import * as M from "./main";
 import { Shape } from "./type";
 import * as U from "./utils";
@@ -137,8 +139,8 @@ test("expects array of integers", () => {
   const shape: Shape = {
     ids: { $array: { type: "number" } },
   };
-  
-  const body = { ids: [1,2,3] };
+
+  const body = { ids: [1, 2, 3] };
   const m = M.checkObject(body, shape);
 
   expect(m).toEqual({});
