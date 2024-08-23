@@ -1,5 +1,7 @@
 import * as VT from "./type";
 
+// compare with note: taken from https://github.com/Nexysweb/utils/blob/master/src/string.ts#L159
+
 /**
  * Checks if the input string is a valid email.
  * @param   email - The email string to validate.
