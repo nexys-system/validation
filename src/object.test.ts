@@ -1,3 +1,5 @@
+import { test, expect } from "bun:test";
+
 import * as M from "./main";
 import * as T from "./type";
 import * as U from "./utils";
@@ -53,16 +55,16 @@ test("is object - optional nested", () => {
   expect(m).toEqual({});
 });
 
-test('generic object - optional', () => {
+test("generic object - optional", () => {
   const shape: T.Shape = {
     uuid: { extraCheck: U.checkUuid },
     params: { type: "object", optional: true },
     data: { type: "object", optional: true },
   };
-  
-  const input = {uuid: 'ef04fafc-af19-11eb-847c-42010aac003d'};
-  
+
+  const input = { uuid: "ef04fafc-af19-11eb-847c-42010aac003d" };
+
   const m = M.checkObject(input, shape);
 
   expect(m).toEqual({});
-})
+});
