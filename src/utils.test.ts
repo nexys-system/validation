@@ -41,3 +41,16 @@ test("is integer", () => {
   expect(U.checkInteger(12.3)).toEqual(["must be an integer"]);
   expect(U.checkInteger(-12)).toEqual(["negative numbers are not accepted"]);
 });
+
+test("check JSON", () => {
+  // Valid JSON strings
+  expect(U.checkJSON('{"name": "John", "age": 30}')).toEqual(undefined);
+  expect(U.checkJSON('[1, 2, 3, 4]')).toEqual(undefined);
+  expect(U.checkJSON('"This is a valid JSON string"')).toEqual(undefined);
+  
+  // Invalid JSON strings
+  expect(U.checkJSON('{name: "John", age: 30}')).toEqual(["must be a JSON"]);
+  expect(U.checkJSON('[1, 2, 3, 4')).toEqual(["must be a JSON"]);
+  expect(U.checkJSON('Invalid JSON')).toEqual(["must be a JSON"]);
+});
+
