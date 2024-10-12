@@ -1,4 +1,4 @@
-import { test, expect } from "bun:test";
+import { describe, test, expect } from "bun:test";
 import * as U from "./utils";
 
 test("check email", () => {
@@ -55,4 +55,44 @@ test("check JSON", () => {
   expect(U.checkJSON('{name: "John", age: 30}')).toEqual(["must be a JSON"]);
   expect(U.checkJSON("[1, 2, 3, 4")).toEqual(["must be a JSON"]);
   expect(U.checkJSON("Invalid JSON")).toEqual(["must be a JSON"]);
+});
+
+describe('isInSet function', () => {
+
+  test('returns undefined when input is in the set', () => {
+    const validSet = new Set(['apple', 'banana', 'cherry']);
+    const result = U.isInSet(validSet)('apple');
+    expect(result).toBeUndefined();
+  });
+
+  test('returns an error message when input is not in the set', () => {
+    const validSet = new Set(['apple', 'banana', 'cherry']);
+    const result = U.isInSet(validSet)('orange');
+    expect(result).toEqual([`input "orange" is not in the set`]);
+  });
+
+  test('returns an error message when the set is empty', () => {
+    const emptySet = new Set<string>();
+    const result = U.isInSet(emptySet)('anything');
+    expect(result).toEqual([`input "anything" is not in the set`]);
+  });
+
+  test('returns undefined when input exists in a set of numbers', () => {
+    const numberSet = new Set([1, 2, 3]);
+    const result = U.isInSet(numberSet)('2');
+    expect(result).toBeUndefined(); // Because '2' as a string matches the number 2 when cast correctly
+  });
+
+  test('returns an error message when input does not match any number in the set', () => {
+    const numberSet = new Set([1, 2, 3]);
+    const result = U.isInSet(numberSet)('4');
+    expect(result).toEqual([`input "4" is not in the set`]);
+  });
+
+  test('works with mixed types (e.g., string and number)', () => {
+    const mixedSet = new Set([1, 'apple', 3, 'banana']);
+    expect(U.isInSet(mixedSet)('apple')).toBeUndefined();
+    expect(U.isInSet(mixedSet)('1')).toEqual([`input "1" is not in the set`]);
+  });
+
 });
