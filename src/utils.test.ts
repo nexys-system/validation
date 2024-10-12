@@ -25,8 +25,8 @@ test("check uuid", () => {
 test("regex check", () => {
   const r: RegExp = /^My\d{3}$/;
 
-  expect(U.regexCheck("My123", r)).toEqual(undefined as any);
-  expect(U.regexCheck("My1234", r)).toEqual([
+  expect(U.regexCheck(r)("My123")).toEqual(undefined as any);
+  expect(U.regexCheck(r)("My1234")).toEqual([
     "regex /^My\\d{3}$/ not satisfied",
   ]);
 });
