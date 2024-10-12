@@ -86,10 +86,7 @@ export const passwordCheck = (password: string): VT.ErrorOut | undefined => {
  * @param  regex - The regular expression to test against.
  * @return An array of error messages, or `undefined` if the string satisfies the regex.
  */
-export const regexCheck = (
-  s: string,
-  regex: RegExp
-): VT.ErrorOut | undefined => {
+export const regexCheck = (regex: RegExp) => (s: string): VT.ErrorOut | undefined => {
   const r = s.match(regex);
 
   if (r === null) {
@@ -97,6 +94,19 @@ export const regexCheck = (
   }
 
   return;
+};
+
+// Function that checks if the input string exists in a provided Set
+export const isInSetCheck = <A>(inputSet: Set<A>) => (input: string): VT.ErrorOut | undefined => {
+
+  // Check if the input string exists in the set (casting input as A, since Set<A> expects type A)
+  if (!inputSet.has(input as unknown as A)) {
+    
+    // Return an error message in an array if input is not in the set
+    return [`input "${input}" is not in the set`];
+  }
+
+  // Return undefined if input is valid (i.e., exists in the set)
 };
 
 /**
