@@ -10,7 +10,8 @@ import * as VT from "./type";
  * @see     http://www.w3.org/TR/html5/forms.html#valid-e-mail-address
  */
 const isEmail = (email: string): boolean => {
-  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/i;
+  const emailRegex =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/i;
   const regexResult = email.match(emailRegex);
 
   return !!regexResult && regexResult.includes(email);
@@ -86,28 +87,30 @@ export const passwordCheck = (password: string): VT.ErrorOut | undefined => {
  * @param  regex - The regular expression to test against.
  * @return An array of error messages, or `undefined` if the string satisfies the regex.
  */
-export const regexCheck = (regex: RegExp) => (s: string): VT.ErrorOut | undefined => {
-  const r = s.match(regex);
+export const regexCheck =
+  (regex: RegExp) =>
+  (s: string): VT.ErrorOut | undefined => {
+    const r = s.match(regex);
 
-  if (r === null) {
-    return [`regex ${regex} not satisfied`];
-  }
+    if (r === null) {
+      return [`regex ${regex} not satisfied`];
+    }
 
-  return;
-};
+    return;
+  };
 
 // Function that checks if the input string exists in a provided Set
-export const isInSetCheck = <A>(inputSet: Set<A>) => (input: string): VT.ErrorOut | undefined => {
+export const isInSetCheck =
+  <A>(inputSet: Set<A>) =>
+  (input: string): VT.ErrorOut | undefined => {
+    // Check if the input string exists in the set (casting input as A, since Set<A> expects type A)
+    if (!inputSet.has(input as unknown as A)) {
+      // Return an error message in an array if input is not in the set
+      return [`input "${input}" is not in the set`];
+    }
 
-  // Check if the input string exists in the set (casting input as A, since Set<A> expects type A)
-  if (!inputSet.has(input as unknown as A)) {
-    
-    // Return an error message in an array if input is not in the set
-    return [`input "${input}" is not in the set`];
-  }
-
-  // Return undefined if input is valid (i.e., exists in the set)
-};
+    // Return undefined if input is valid (i.e., exists in the set)
+  };
 
 /**
  * Validates if a number is an integer and optionally if it can be negative.
@@ -162,7 +165,7 @@ export const checkISODateFormat = (
   const r = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 
   if (r === null || r.length < 4) {
-    return ['date format not accepted, please pass YYYY-MM-DD'];
+    return ["date format not accepted, please pass YYYY-MM-DD"];
   }
 
   const [, year, month, day] = r;
@@ -176,41 +179,41 @@ export const checkISODateFormat = (
   const { yearMin = 1900, yearMax = 2300 } = options;
 
   if (iDay < 1) {
-    errors.push('day must be greater than zero');
+    errors.push("day must be greater than zero");
   }
 
   if (iMonth < 1) {
-    errors.push('month must be greater than zero');
+    errors.push("month must be greater than zero");
   }
 
   if (iMonth > 12) {
-    errors.push('month must be smaller than 12');
+    errors.push("month must be smaller than 12");
   }
 
   if (iYear < yearMin) {
-    errors.push('year must be greater than ' + yearMin);
+    errors.push("year must be greater than " + yearMin);
   }
 
   if (iYear > yearMax) {
-    errors.push('year must be smaller than ' + yearMax);
+    errors.push("year must be smaller than " + yearMax);
   }
 
   const isLeapYear = Math.abs(1988 - iYear) % 4 === 0;
 
   if (iMonth === 2) {
     if (!isLeapYear && iDay > 28) {
-      errors.push('day must be smaller than 28 (February)');
+      errors.push("day must be smaller than 28 (February)");
     }
 
     if (isLeapYear && iDay > 29) {
-      errors.push('day must be smaller than 29 (February and leap year)');
+      errors.push("day must be smaller than 29 (February and leap year)");
     }
   } else {
     if (monthW30Days.includes(iMonth) && iDay > 30) {
       errors.push(`day must be smaller than 30 (month of ${iMonth})`);
     } else {
       if (iDay > 31) {
-        errors.push('day must be smaller than 31');
+        errors.push("day must be smaller than 31");
       }
     }
   }
